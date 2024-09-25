@@ -6,37 +6,38 @@ on:
   pull_request:
     branches: [master,dev]
 
+
 jobs:
-  build:
+    build:
+      runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    steps:
-    - uses: actions/checkout@v3
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install black flake8 isort pytest pytest-asyncio
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install black flake8 isort pytest pytest-asyncio
+      - name: Lint with flake8
+        run: |
+          flake8 app tests
 
-    - name: Lint with flake8
-      run: |
-        flake8 app tests
+      - name: Format with black
+        run: |
+          black --check app tests
 
-    - name: Format with black
-      run: |
-        black --check app tests
+      - name: Sort imports with isort
+        run: |
+          isort --check-only app tests
 
-    - name: Sort imports with isort
-      run: |
-        isort --check-only app tests
-
-    - name: Run tests
-      run: |
-        pytest tests
+      - name: Run tests
+        run: |
+          pytest tests
