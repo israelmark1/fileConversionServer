@@ -1,6 +1,6 @@
-# Word to PDF Conversion Service
+# file Conversion to PDF Service
 
-A Python service using FastAPI to convert Word documents to PDF.
+A Python service using FastAPI to convert documents to PDF.
 
 ## Features
 
