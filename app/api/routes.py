@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, header
+from fastapi import APIRouter, BackgroundTasks, Header, HTTPException
 
 from app.core.config import settings
 from app.models.schemas import ConversionRequest
@@ -13,7 +13,7 @@ router = APIRouter()
 async def convert_file(
     request: ConversionRequest,
     background_tasks: BackgroundTasks,
-    authorization: Optional[str] = header(None),
+    authorization: Optional[str] = Header(None),
 ):
     if authorization != f"Bearer ${settings.API_TOKEN}":
         raise HTTPException(status_code=401, detail="Unauthorized")
