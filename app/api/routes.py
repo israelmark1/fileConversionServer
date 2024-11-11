@@ -4,7 +4,7 @@ import traceback
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 
 from app.models.schemas import ConversionRequest
-from app.services.conversion.conversion import process_conversion
+from app.services.conversion.conversion import ConversionFile
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -38,7 +38,8 @@ async def run_conversion_task(request: ConversionRequest):
         logger.info(
             f"Starting background conversion task for document ID: {request.docId}"
         )
-        await process_conversion(request)
+        conversion = ConversionFile()
+        await conversion.process_file(request)
         logger.info(f"Completed file conversion for document ID: {request.docId}")
     except Exception as e:
         logger.error(

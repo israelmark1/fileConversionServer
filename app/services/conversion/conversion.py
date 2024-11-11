@@ -14,7 +14,7 @@ from app.models.schemas import ConversionRequest
 logger = logging.getLogger(__name__)
 
 
-class ConversionService:
+class ConversionFile:
     def __init__(self):
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.downloads_dir = os.path.join(self.base_dir, "downloads")
@@ -121,7 +121,7 @@ class ConversionService:
                 except Exception as e:
                     logger.warning(f"Failed to delete file '{file_path}': {str(e)}")
 
-    async def process_conversion(self, request: ConversionRequest):
+    async def process_file(self, request: ConversionRequest):
         doc_id = request.docId
         file_name = os.path.basename(request.fileName)
         file_path = re.sub(r"^gs://[^/]+/", "", request.filePath)
