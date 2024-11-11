@@ -9,7 +9,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     FIREBASE_CREDENTIALS_PATH: str = os.getenv(
-        "FIREBASE_CREDENTIALS", "serviceAccountKey.json"
+        "FIREBASE_CREDENTIALS_PATH", "serviceAccountKey.json"
     )
     FIREBASE_STORAGE_BUCKET: str = os.getenv("FIREBASE_STORAGE_BUCKET", "")
 
