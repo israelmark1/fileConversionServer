@@ -1,17 +1,22 @@
 import asyncio
 import logging
 import os
+import platform
 import re
+import subprocess
 from datetime import timedelta
 from functools import partial
 
-from docx2pdf import convert
+from dotenv import load_dotenv
 from fastapi import HTTPException
 
 from app.core.firebase import bucket, db, firestore
 from app.models.schemas import ConversionRequest
 
 logger = logging.getLogger(__name__)
+
+env_file = ".env.local" if os.getenv("ENV_MODE") == "local" else ".env.docker"
+load_dotenv(env_file)
 
 
 class ConversionFile:
@@ -50,8 +55,28 @@ class ConversionFile:
     async def convert_to_pdf(self, file_name, doc_id, local_doc_path, local_pdf_path):
         try:
             logger.info(f"Converting '{local_doc_path}' to PDF at '{local_pdf_path}'")
-            convert(local_doc_path, local_pdf_path)
-            logger.info(f"File converted successfully to '{local_pdf_path}'")
+
+            if platform.system() == "Windows":
+                libreoffice_path = os.getenv("LIBREOFFICE_PATH")
+            else:
+                libreoffice_path = "soffice"
+
+            command = [
+                libreoffice_path,
+                "--headless",
+                "--convert-to",
+                "pdf",
+                "--outdir",
+                os.path.dirname(local_pdf_path),
+                local_doc_path,
+            ]
+            logger.info(f"Running LibreOffice conversion command: {command}")
+            process = subprocess.run(command, check=True)
+
+            if process.returncode != 0:
+                raise Exception("LibreOffice conversion failed.")
+
+            logger.info(f"File converted successfully to PDF at '{local_pdf_path}'")
         except Exception as e:
             logger.error(f"Error converting file '{file_name}' to PDF: {str(e)}")
             await self.update_status(doc_id, "error", errorMessage=str(e))
