@@ -4,7 +4,8 @@ import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-load_dotenv()
+env_file = ".env.local" if os.getenv("ENV_MODE") == "local" else ".env.docker"
+load_dotenv(env_file)
 
 
 class Settings(BaseSettings):
